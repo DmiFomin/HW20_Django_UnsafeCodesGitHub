@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Поиск уязвимостей в модулях GitHub. Главная.
+{% endblock %}
+
+{% block content %}
+    <h3 class="mb-0">Поиск уязвимостей в модулях</h3>
+    <h2 class="text-primary">GitHub </h2>
+    <div class="w-100">
+        <div class="subheading mb-3">Уязвимости</div>
+        <ul class="fa-ul mb-0">
+
+            {% for item in unsafe_codes %}
+            <li>
+                <i class="fa-li fa fa-check"></i>
+                {{item.description}}
+            </li>
+            {% endfor %}
+
+        </ul>
+    </div>
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Поиск уязвимостей в модулях GitHub. Поиск.
+{% endblock %}
+
+{% block content %}
+    <form method="post">
+
+        <h2 class="mb-5">Поиск</h2>
+
+        <div class="w-100">
+            <div class="subheading mb-3">Что искать</div>
+            <ul class="fa-ul mb-0">
+
+                {% for item in unsafe_codes %}
+                <li>
+                     <label>
+                         {{item.description}}
+                         </br>
+                         {{item.string_code}}
+                    </label>
+                </li>
+                {% endfor %}
+
+            </ul>
+        </div>
+
+        </br>
+
+        <div class="w-100">
+            <div class="subheading mb-3">Репозиторий</div>
+            <ul class="fa-ul mb-0">
+
+                <label>Для поиска в определенном репозитории введите имя пользователя этого репозитория</label>
+                <input type="text" class="form-control" name="repository_name" placeholder="Имя пользователя" value={{user_settings.repository_name}}>
+
+            </ul>
+        </div>
+
+        </br>
+        </br>
+
+        <button type="submit" class="btn btn-warning">Искать</button>
+
+     </form>
+{% endblock %}
+
