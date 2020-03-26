@@ -6,7 +6,7 @@
 
 {% block content %}
     <form method="post">
-
+        {% csrf_token %}
         <h2 class="mb-5">Поиск</h2>
 
         <div class="w-100">
@@ -15,10 +15,9 @@
 
                 {% for item in unsafe_codes %}
                 <li>
-                     <label>
-                         {{item.description}}
-                         </br>
-                         {{item.string_code}}
+                    <input type="checkbox" class="checkbox" name={{item.string_code}} id={{item.string_code.}} checked/>
+                    <label>
+                        {{item.description}}
                     </label>
                 </li>
                 {% endfor %}
@@ -31,9 +30,8 @@
         <div class="w-100">
             <div class="subheading mb-3">Репозиторий</div>
             <ul class="fa-ul mb-0">
-
                 <label>Для поиска в определенном репозитории введите имя пользователя этого репозитория</label>
-                <input type="text" class="form-control" name="repository_name" placeholder="Имя пользователя" value={{user_settings.repository_name}}>
+                <input type="text" class="form-control" name="repository_name" placeholder="Имя пользователя" value={{repository_name}}>
 
             </ul>
         </div>

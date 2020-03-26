@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Поиск уязвимостей в модулях GitHub. Главная.
+{% endblock %}
+
+{% block content %}
+
+    <div class="w-100">
+        <div class="subheading mb-3">Изменить описание уязвимости</div>
+
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            </br>
+            <button type="submit" class="btn btn-primary">Сохранить</button>
+        </form>
+
+    </div>
+{% endblock %}

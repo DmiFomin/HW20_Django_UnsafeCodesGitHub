@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Поиск уязвимостей в модулях GitHub. Главная.
+{% endblock %}
+
+{% block content %}
+
+    <div class="w-100">
+
+        Операция удаления необратима!
+        </br>
+        Вы уверены, что хотите удалить запись?
+        </br>
+        </br>
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Да, уверен!</button>
+        </form>
+
+    </div>
+{% endblock %}
