@@ -15,9 +15,14 @@
             <li>
                 <i class="fa-li fa fa-check"></i>
                 {{item.description}}
+                |
+                <a href="{% url 'searching_unsafe_codes:unsafe_codes_update' pk=item.pk %}">Изменить описание</a>
+                |
+                <a href="{% url 'searching_unsafe_codes:unsafe_codes_delete' pk=item.pk %}">Удалить запись</a>
             </li>
             {% endfor %}
 
         </ul>
+
     </div>
 {% endblock %}

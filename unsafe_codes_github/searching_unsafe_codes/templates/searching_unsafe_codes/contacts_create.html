@@ -9,14 +9,15 @@
 
     <div class="resume-item d-flex flex-column flex-md-row justify-content-between mb-5">
         <div class="resume-content">
-            <h3 class="mb-3">{{settings.author}}</h3>
-            <div class="subheading mb-0">{{settings.email}}</div>
-            <div class="subheading mb-3">{{settings.phone}}</div>
-            </br>
-            <a href="{% url 'searching_unsafe_codes:contacts_create' %}">Редактировать</a>
+
+            <div class="subheading mb-3">Изменение контактной информации</div>
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                </br>
+                <button type="submit" class="btn btn-primary">Сохранить</button>
+            </form>
         </div>
-
-
 
     </div>
 {% endblock %}
