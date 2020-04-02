@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Поиск уязвимостей в модулях GitHub. Вход на сайт.
+{% endblock %}
+
+{% block content %}
+    <h2 class="mb-5">Вход на сайт</h2>
+
+    <div class="resume-item d-flex flex-column flex-md-row justify-content-between mb-5">
+        <div class="resume-content">
+            <form method="post">
+                {% csrf_token %}
+                {{form.as_p}}
+                <a href="{% url 'users_and_permissions:registration_user' %}">Регистрация</a>
+                &nbsp
+                <a href="{% url 'users_and_permissions:recovery_password' %}">Забыли пароль</a>
+                </br>
+                </br>
+                <button type="submit" class="btn btn-primary">Войти</button>
+            </form>
+        </div>
+        </div>
+
+    </div>
+{% endblock %}
