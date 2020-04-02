@@ -15,10 +15,12 @@
             <li>
                 <i class="fa-li fa fa-check"></i>
                 {{item.description}}
+                {% if user.is_superuser %}
                 |
                 <a href="{% url 'searching_unsafe_codes:unsafe_codes_update' pk=item.pk %}">Изменить описание</a>
                 |
                 <a href="{% url 'searching_unsafe_codes:unsafe_codes_delete' pk=item.pk %}">Удалить запись</a>
+                {% endif %}
             </li>
             {% endfor %}
 

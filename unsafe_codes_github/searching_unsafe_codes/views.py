@@ -2,6 +2,7 @@ from django.shortcuts import render, HttpResponseRedirect
 from django.urls import reverse, reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.views.generic.base import ContextMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from .models import Unsafe_codes, Settings, History
 from .forms import SettingsForm
 
@@ -39,6 +40,7 @@ class UnsafeCodesDeleteView(DeleteView):
     template_name = 'searching_unsafe_codes/unsafe_codes_delete.html'
 
 
+
 # def searching(request):
 #     unsafe_codes = Unsafe_codes.objects.all()
 #     if request.method == 'POST':
@@ -47,10 +49,11 @@ class UnsafeCodesDeleteView(DeleteView):
 #         return render(request, 'searching_unsafe_codes/searching.html', context={'unsafe_codes': unsafe_codes, 'user_settings': {}})
 
 
-class SearchingView(ListView, UserSettingsContexMixin):
+class SearchingView(LoginRequiredMixin, ListView, UserSettingsContexMixin):
     model = Unsafe_codes
     template_name = 'searching_unsafe_codes/searching.html'
     context_object_name = 'unsafe_codes'
+
 
     # def get_queryset(self):
     #     return Unsafe_codes.objects.all()
@@ -60,10 +63,14 @@ class SearchingView(ListView, UserSettingsContexMixin):
 #     return render(request, 'searching_unsafe_codes/searching_history.html', context={})
 
 
-class SearchingHistoryView(ListView):
+class SearchingHistoryView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = History
     template_name = 'searching_unsafe_codes/searching_history.html'
     context_object_name = 'searching_history'
+
+    def test_func(self):
+        # TODO Для обычных юзеров добавить просмотр только своей истории user = self.request.user
+        return self.request.user.is_superuser or self.request.user.is_view_history
 
 
 # def contacts(request):
@@ -83,7 +90,7 @@ class ContactsView(ListView):
         return Settings.objects.last()
 
 
-class ContactsCreateView(CreateView):
+class ContactsCreateView(UserPassesTestMixin, CreateView):
     #fields = '__all__'
     #exclude = ('path_to_token',)
     fields = ('author', 'phone', 'email')
@@ -91,8 +98,13 @@ class ContactsCreateView(CreateView):
     success_url = reverse_lazy('searching_unsafe_codes:contacts')
     template_name = 'searching_unsafe_codes/contacts_create.html'
 
+    def form_valid(self, form):
+        form.instance.create_user = self.request.user
+        print(self.request.user)
+        return super().form_valid(form)
 
-
+    def test_func(self):
+        return self.request.user.is_superuser
 
 # def settings(request):
 #     if request.method == 'POST':

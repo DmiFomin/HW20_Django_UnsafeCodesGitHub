@@ -18,5 +18,6 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('searching_unsafe_codes.urls', namespace='unsafe_codes_github'))
+    path('', include('searching_unsafe_codes.urls', namespace='searching_unsafe_codes')),
+    path('users/', include('users_and_permissions.urls', namespace='users_and_permissions'))
 ]

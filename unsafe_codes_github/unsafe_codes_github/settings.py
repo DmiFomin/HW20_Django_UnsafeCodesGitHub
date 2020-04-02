@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'searching_unsafe_codes',
+    'users_and_permissions',
 ]
 
 MIDDLEWARE = [
@@ -120,3 +121,11 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+
+# Переопределяем стандартного пользователя на расширенного
+AUTH_USER_MODEL = 'users_and_permissions.AdvancedUser'
+
+# Редиректы
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
+LOGIN_URL = '/users/login/'

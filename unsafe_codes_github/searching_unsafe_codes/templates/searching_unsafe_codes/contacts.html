@@ -12,8 +12,10 @@
             <h3 class="mb-3">{{settings.author}}</h3>
             <div class="subheading mb-0">{{settings.email}}</div>
             <div class="subheading mb-3">{{settings.phone}}</div>
+            {% if user.is_superuser %}
             </br>
             <a href="{% url 'searching_unsafe_codes:contacts_create' %}">Редактировать</a>
+            {% endif %}
         </div>
 
 
