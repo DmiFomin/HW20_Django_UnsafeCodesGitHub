@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'searching_unsafe_codes',
     'users_and_permissions',
+    #'send_email.apps.SendEmailConfig',
 ]
 
 MIDDLEWARE = [
@@ -129,3 +130,10 @@ AUTH_USER_MODEL = 'users_and_permissions.AdvancedUser'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 LOGIN_URL = '/users/login/'
+
+# Настройка почты
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = ''
+EMAIL_HOST_PASSWORD = ''
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

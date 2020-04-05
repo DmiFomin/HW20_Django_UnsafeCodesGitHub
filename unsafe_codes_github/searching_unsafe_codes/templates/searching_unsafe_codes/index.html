@@ -16,10 +16,27 @@
                 <i class="fa-li fa fa-check"></i>
                 {{item.description}}
                 {% if user.is_superuser %}
-                |
-                <a href="{% url 'searching_unsafe_codes:unsafe_codes_update' pk=item.pk %}">Изменить описание</a>
-                |
-                <a href="{% url 'searching_unsafe_codes:unsafe_codes_delete' pk=item.pk %}">Удалить запись</a>
+                    |
+                    <a href="{% url 'searching_unsafe_codes:unsafe_codes_update' pk=item.pk %}">Изменить описание</a>
+                    |
+                    <a href="{% url 'searching_unsafe_codes:unsafe_codes_delete' pk=item.pk %}">Удалить запись</a>
+
+                    {% if not item.is_language %}
+                        <mark> Не указан язык программирования! </mark>
+                    {% endif %}
+
+                    {% if not item.is_string_code %}
+                        <mark> Не указан строковый код! </mark>
+                    {% endif %}
+
+                    {% if not item.is_description %}
+                        <mark> Не задано описание! </mark>
+                    {% endif %}
+
+                    {% if not item.is_status %}
+                        <mark> Не указан статус опасного кода! </mark>
+                    {% endif %}
+
                 {% endif %}
             </li>
             {% endfor %}
