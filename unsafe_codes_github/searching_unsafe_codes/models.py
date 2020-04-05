@@ -1,11 +1,12 @@
 from django.db import models
 from users_and_permissions.models import AdvancedUser
+import os
 
 
 # Create your models here.
 class Settings(models.Model):
     date = models.DateTimeField(auto_now_add=True)
-    path_to_token = models.CharField(max_length=15)
+    path_to_token = models.CharField(max_length=15, default=os.path.join(os.getcwd(), 'GitHub_Token'))
     author = models.CharField(max_length=80, verbose_name='Автор')
     phone = models.CharField(max_length=20, verbose_name='Телефон')
     email = models.EmailField(max_length=30, verbose_name='E-mail')
@@ -15,6 +16,17 @@ class Settings(models.Model):
         verbose_name = 'Настройка'
         verbose_name_plural = 'Настройки'
 
+    def __str__(self):
+        return f'Дата создания: {self.date}, ' \
+               f'Кто создал: {self.create_user}, ' \
+               f'Автор: {self.author}, ' \
+               f'Телефон: {self.phone}, ' \
+               f'E-mail: {self.email}'
+
+    # Если путь до токена не заполнен, то поиск работать не будет.
+    def is_path_to_token(self):
+        return self.path_to_token != ''
+
 
 class Statuses(models.Model):
     description = models.CharField(max_length=50, unique=True)
@@ -23,6 +35,9 @@ class Statuses(models.Model):
     class Meta:
         verbose_name = 'Статус'
         verbose_name_plural = 'Статусы'
+
+    def __str__(self):
+        return f'Статус кода {self.description}'
 
 
 class Languages(models.Model):
@@ -45,6 +60,20 @@ class Unsafe_codes(models.Model):
     class Meta:
         verbose_name = 'Опасный код'
         verbose_name_plural = 'Список опасных кодов'
+
+    # Проверяем заполнение обязательных полей
+    def is_language(self):
+        return self.language is not None
+
+    def is_string_code(self):
+        return self.string_code != ''
+
+    def is_description(self):
+        return self.description != ''
+
+    def is_status(self):
+        return self.status is not None
+
 
 
 class History(models.Model):
