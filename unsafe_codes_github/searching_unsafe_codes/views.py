@@ -1,17 +1,26 @@
 from django.shortcuts import render, HttpResponseRedirect
 from django.urls import reverse, reverse_lazy
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, FormView
 from django.views.generic.base import ContextMixin
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from .models import Unsafe_codes, Settings, History
 from .forms import SettingsForm
+import functions as fn
+
+
+user_settings = 'eval;sqlite3;pickle;EMAIL_HOST_USER;EMAIL_HOST_PASSWORD;' #{'eval': 'on', 'sqlite3': 'on', 'pickle': 'on', 'EMAIL_HOST_USER': 'on', 'EMAIL_HOST_PASSWORD': 'on'}
+repository_name = ''
+danger_modules_describe = {}
 
 
 class UserSettingsContexMixin(ContextMixin):
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        # Для проверки указал название репозитория
-        context['repository_name'] = 'DmiFomin'
+
+        context['user_settings'] = user_settings
+        context['repository_name'] = repository_name
+        context['danger_modules_describe'] = danger_modules_describe
+
         return context
 
 
@@ -40,7 +49,6 @@ class UnsafeCodesDeleteView(DeleteView):
     template_name = 'searching_unsafe_codes/unsafe_codes_delete.html'
 
 
-
 # def searching(request):
 #     unsafe_codes = Unsafe_codes.objects.all()
 #     if request.method == 'POST':
@@ -50,13 +58,27 @@ class UnsafeCodesDeleteView(DeleteView):
 
 
 class SearchingView(LoginRequiredMixin, ListView, UserSettingsContexMixin):
+    #form_class = SearchingForm
     model = Unsafe_codes
     template_name = 'searching_unsafe_codes/searching.html'
     context_object_name = 'unsafe_codes'
 
+    def post(self, request, *args, **kwargs):
+        global user_settings
+        global repository_name
+        global danger_modules_describe
 
-    # def get_queryset(self):
-    #     return Unsafe_codes.objects.all()
+        user_settings = ''
+        params = request.POST
+        for param in params:
+            if param != 'repository_name':
+                user_settings = f'{param};{user_settings}'
+            else:
+                repository_name = params['repository_name']
+
+        danger_modules_describe = fn.seaching_unsafe_code(user_settings, repository_name)
+
+        return HttpResponseRedirect(reverse('searching_unsafe_codes:searching'))
 
 
 # def searching_history(request):
@@ -100,7 +122,7 @@ class ContactsCreateView(UserPassesTestMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.create_user = self.request.user
-        print(self.request.user)
+        #print(self.request.user)
         return super().form_valid(form)
 
     def test_func(self):
