@@ -37,7 +37,7 @@ class Statuses(models.Model):
         verbose_name_plural = 'Статусы'
 
     def __str__(self):
-        return f'Статус кода {self.description}'
+        return self.description
 
 
 class Languages(models.Model):
@@ -47,6 +47,9 @@ class Languages(models.Model):
     class Meta:
         verbose_name = 'Язык программирования'
         verbose_name_plural = 'Языки программирования'
+
+    def __str__(self):
+        return self.name
 
 
 class Unsafe_codes(models.Model):
@@ -73,7 +76,6 @@ class Unsafe_codes(models.Model):
 
     def is_status(self):
         return self.status is not None
-
 
 
 class History(models.Model):
