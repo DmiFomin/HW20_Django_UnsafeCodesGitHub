@@ -4,7 +4,8 @@ import pprint
 import base64
 import re
 import requests
-from searching_unsafe_codes.models import Settings, Unsafe_codes
+from searching_unsafe_codes.models import Settings, Unsafe_codes, History, History_repositories, History_unsafe_code
+import utility as utility
 
 
 def load_token(path):
@@ -122,7 +123,7 @@ def write_results(item, danger_modules_describe, element_unsafe_code, session):
     for result_check in result_check_list:
         #print(result_check)
         repository_url = item['repository']['html_url']
-        language = str(element_unsafe_code.language)
+        language = element_unsafe_code.language
         name_module = item['name']
         description = result_check['description']
         status = result_check['status']
@@ -130,8 +131,9 @@ def write_results(item, danger_modules_describe, element_unsafe_code, session):
         #pprint.pprint(item)
 
         # Для вывода в шаблоне Django меняем словарь на список. Со словарем в шаблоне сложно работать.
-        # unsafe_modules = {'name_module': name_module, 'description': description, 'status': status, 'url_module': url_module}
-        unsafe_modules = [name_module, description, status, url_module]
+        # Оставляем словарь для использования шаблонного фильтра.
+        unsafe_modules = {'name_module': name_module, 'description': description, 'status': status, 'url_module': url_module}
+        #unsafe_modules = [name_module, description, status, url_module]
 
         if repository_url in danger_modules_describe:
             if not (language in danger_modules_describe[repository_url]['languages']):
@@ -153,14 +155,29 @@ def write_json(danger_modules_describe):
         #pprint.pprint(danger_modules_describe)
 
 
-def write_to_base(danger_modules_describe, user_settings):
+def write_to_base(danger_modules_describe, user_settings, repository_name, current_user):
     '''
     Записываем результат в БД
     :param danger_modules_describe: словарь с опасным кодом
     :param user_settings: настройки пользователя
     '''
-    #orm.add_history(danger_modules_describe, user_settings)
-    pass
+    history_record = History()
+    history_record.params = user_settings
+    history_record.repository_name = repository_name
+    history_record.user = current_user
+    history_record.save()
+
+    for item in danger_modules_describe.items():
+        history_repositories = History_repositories()
+        history_repositories.history=history_record
+        history_repositories.repository=item[0]
+        history_repositories.language=item[1]['languages'][0]
+        history_repositories.save()
+
+        for item_unsafe_modules in item[1]['unsafe_modules']:
+            History_unsafe_code(repository=history_repositories, unsafe_code=utility.dict_to_str(item_unsafe_modules)).save()
+
+    return history_record.id
 
 
 def get_history_list(id=None):
@@ -175,18 +192,22 @@ def get_history_list(id=None):
 
 
 def get_danger_modules_describe(id):
-    '''
-    Получаем из БД опасный код для истории поиска
-    :param id: идентификатор записи
-    :return: словарь
-    '''
-    #danger_modules_describe = orm.get_danger_modules_describe(id)
 
-    #return danger_modules_describe
-    pass
+    result_repository = History_repositories.objects.filter(history=id)
+    danger_modules_describe = {}
+    for item_repository in result_repository:
+        result_unsafe_code = History_unsafe_code.objects.filter(repository=item_repository.id)
+        list_unsafe_code = []
+        for item_unsafe_code in result_unsafe_code:
+            list_unsafe_code.append(utility.dict_from_str(item_unsafe_code.unsafe_code))
+
+        danger_modules_describe[item_repository.repository] = {'languages': [item_repository.language],
+                                                               'unsafe_modules': list_unsafe_code}
+
+    return danger_modules_describe
 
 
-def seaching_unsafe_code(user_settings, repository_name):
+def seaching_unsafe_code(user_settings, repository_name, current_user):
     '''
     Поиск опасного кода
     :param user_settings: настройки пользователя
@@ -194,14 +215,12 @@ def seaching_unsafe_code(user_settings, repository_name):
     :return: словарь
     '''
     #Загружаем токен из файла
-    #token = load_token(PROGRAM_SETTINGS['path_to_token'])
     last_setting = Settings.objects.last()
     token = load_token(last_setting.path_to_token)
 
     session = requests.Session()
     session.auth = ('DmiFomin', token)
 
-    #unsafe_code = PROGRAM_SETTINGS['unsafe_codes']
     unsafe_code = Unsafe_codes.objects.all()
     danger_modules_describe = {}
 
@@ -232,5 +251,5 @@ def seaching_unsafe_code(user_settings, repository_name):
 
     #print(danger_modules_describe)
     #write_json(danger_modules_describe)
-    write_to_base(danger_modules_describe, user_settings)
-    return danger_modules_describe
+    history_id = write_to_base(danger_modules_describe, user_settings, repository_name, current_user)
+    return history_id, danger_modules_describe

@@ -1,8 +1,9 @@
 from django.test import TestCase
-from .models import Settings, Unsafe_codes, Languages, Statuses
+from .models import Settings, Unsafe_codes, Languages, Statuses, History
 from users_and_permissions.models import AdvancedUser
 from mixer.backend.django import mixer
 from django.test import Client
+from .templatetags import template_filters
 
 # Create your tests here.
 class SettingsTestCase(TestCase):
@@ -17,7 +18,7 @@ class StatusTestCase(TestCase):
 
     def test_str(self):
         status = mixer.blend(Statuses, description='description')
-        self.assertEqual(str(status), 'Статус кода description')
+        self.assertEqual(str(status), 'description')
 
 
 class UnsafeCodesTestCase(TestCase):
@@ -81,3 +82,31 @@ class ViewsTest(TestCase):
         self.client.login(username='test_superuser', password='123qwe123')
         response = self.client.get('/contacts_create/')
         self.assertEqual(response.status_code, 200)
+
+
+class HistoryTest(TestCase):
+
+    def setUp(self):
+        self.client = Client()
+        self.user = AdvancedUser.objects.create_user(username='test_user', email='test_email@email.com', password='123qwe123')
+
+    def test_create_history(self):
+        History(params='settings', user=self.user).save()
+        result = History.objects.all()
+        self.assertGreater(result.count(), 0)
+
+
+class TemplateFiltersTest(TestCase):
+
+    def setUp(self) -> None:
+        self.user_settings = 'eval;sqlite3;pickle;EMAIL_HOST_USER;EMAIL_HOST_PASSWORD;'
+        self.unsafe_code = mixer.blend(Unsafe_codes,
+                                       language = mixer.blend(Languages),
+                                       string_code = 'sqlite3',
+                                       description = 'description',
+                                       add_description = 'add_description',
+                                       status = mixer.blend(Statuses))
+
+    def test_get_user_settings(self):
+        user_settings_list = template_filters.get_user_settings(self.user_settings)
+        self.assertGreater(len(user_settings_list), 0)

@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load template_filters %}
 
 {% block title %}
     Поиск уязвимостей в модулях GitHub. История поиска.
@@ -6,10 +7,41 @@
 
 {% block content %}
     <form method="post">
-
+        {% csrf_token %}
         <h2 class="mb-5">История поиска</h2>
         </br>
-        Здесь будет история поиска
+        <div class="btn-group-vertical" role="group" aria-label="Vertical button group">
+            {% for item in searching_history %}
+                <button type="submit" class="btn btn-secondary" name={{item.id}}>{{item.date}}</button>
+                <h8>Репозиторий: {{item.repository_name}}</h8>
+                {% with user_settings_list=item.params|get_user_settings %}
+                    {% for user_setting in user_settings_list %}
+                        <h8>{{user_setting}}</h8>
+                    {% endfor %}
+                {% endwith %}
+            {% endfor %}
+        </div>
+        </br>
+        </br>
+
+        <div class="pagination">
+            <span class="step-links">
+                {% if page_obj.has_previous %}
+                    <a href="?page=1"> |< </a>
+                    <a href="?page={{ page_obj.previous_page_number }}"> << </a>
+                {% endif %}
+
+                <span class="current">
+                    Стр. {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}.
+                </span>
+
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}"> >> </a>
+                    <a href="?page={{ page_obj.paginator.num_pages }}"> >| </a>
+                {% endif %}
+            </span>
+        </div>
+
    </form>
 {% endblock %}
 
