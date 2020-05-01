@@ -10,7 +10,7 @@ import functions as fn
 
 user_settings = 'eval;sqlite3;pickle;EMAIL_HOST_USER;EMAIL_HOST_PASSWORD;' #{'eval': 'on', 'sqlite3': 'on', 'pickle': 'on', 'EMAIL_HOST_USER': 'on', 'EMAIL_HOST_PASSWORD': 'on'}
 repository_name = ''
-danger_modules_describe = {}
+#danger_modules_describe = {}
 
 
 class UserSettingsContexMixin(ContextMixin):
@@ -19,10 +19,8 @@ class UserSettingsContexMixin(ContextMixin):
 
         context['user_settings'] = user_settings
         context['repository_name'] = repository_name
-        context['danger_modules_describe'] = danger_modules_describe
 
         return context
-
 
 # Create your views here.
 # def main_view(request):
@@ -58,7 +56,6 @@ class UnsafeCodesDeleteView(DeleteView):
 
 
 class SearchingView(LoginRequiredMixin, ListView, UserSettingsContexMixin):
-    #form_class = SearchingForm
     model = Unsafe_codes
     template_name = 'searching_unsafe_codes/searching.html'
     context_object_name = 'unsafe_codes'
@@ -66,7 +63,7 @@ class SearchingView(LoginRequiredMixin, ListView, UserSettingsContexMixin):
     def post(self, request, *args, **kwargs):
         global user_settings
         global repository_name
-        global danger_modules_describe
+        #global danger_modules_describe
 
         user_settings = ''
         params = request.POST
@@ -76,22 +73,39 @@ class SearchingView(LoginRequiredMixin, ListView, UserSettingsContexMixin):
             else:
                 repository_name = params['repository_name']
 
-        danger_modules_describe = fn.seaching_unsafe_code(user_settings, repository_name)
+        history_id, danger_modules_describe = fn.seaching_unsafe_code(user_settings, repository_name, self.request.user)
+        history_list = History.objects.filter(user=self.request.user, id=history_id)
 
-        return HttpResponseRedirect(reverse('searching_unsafe_codes:searching'))
-
+        return render(request, 'searching_unsafe_codes/searching_details.html', context={'history_list': history_list, 'danger_modules_describe': danger_modules_describe})
 
 # def searching_history(request):
 #     return render(request, 'searching_unsafe_codes/searching_history.html', context={})
 
 
 class SearchingHistoryView(LoginRequiredMixin, UserPassesTestMixin, ListView):
+    # TODO Под админом добавить вывод всей истории с указанием пользователя
     model = History
     template_name = 'searching_unsafe_codes/searching_history.html'
     context_object_name = 'searching_history'
+    paginate_by = 4
+
+    def get_queryset(self):
+        return History.objects.filter(user=self.request.user).order_by('-date')
+
+    def post(self, request, *args, **kwargs):
+        params = request.POST
+        try:
+            history_id = list(params.keys())[1]
+            history_list = History.objects.filter(user=self.request.user, id=history_id)
+            danger_modules_describe = fn.get_danger_modules_describe(history_id)
+        except:
+            print('Error of getting history!')
+            history_list = []
+            danger_modules_describe = {}
+
+        return render(request, 'searching_unsafe_codes/searching_details.html', context={'history_list': history_list, 'danger_modules_describe': danger_modules_describe})
 
     def test_func(self):
-        # TODO Для обычных юзеров добавить просмотр только своей истории user = self.request.user
         return self.request.user.is_superuser or self.request.user.is_view_history
 
 

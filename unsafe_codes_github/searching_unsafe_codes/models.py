@@ -1,6 +1,7 @@
 from django.db import models
 from users_and_permissions.models import AdvancedUser
 import os
+from django.utils import timezone
 
 
 # Create your models here.
@@ -81,16 +82,21 @@ class Unsafe_codes(models.Model):
 class History(models.Model):
     date = models.DateTimeField(auto_now_add=True)
     params = models.TextField()
+    repository_name = models.CharField(max_length=150)
     user = models.ForeignKey(AdvancedUser, on_delete=models.CASCADE)
-
     class Meta:
         verbose_name = 'История поиска'
         verbose_name_plural = 'История поиска'
 
+    # Переопределеяем метод save. Записываем текущего юзера.
+    # def save(self, *args, **kwargs):
+    #     super().save(*args, **kwargs)
+    #     # Хотел получить текущего пользователя.
+
 
 class History_repositories(models.Model):
     history = models.ForeignKey(History, on_delete=models.PROTECT)
-    repository = models.URLField
+    repository = models.TextField(blank=True)
     language = models.ForeignKey(Languages, on_delete=models.PROTECT)
 
 

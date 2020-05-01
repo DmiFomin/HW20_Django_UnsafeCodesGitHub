@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% load template_filters %}
+
+{% block title %}
+    Поиск уязвимостей в модулях GitHub. История поиска.
+{% endblock %}
+
+{% block content %}
+    <form method="post">
+        <h2 class="mb-5">Результаты поиска</h2>
+        </br>
+        <div class="btn-group-vertical" role="group" aria-label="Vertical button group">
+            {% for item in history_list %}
+                <button type="submit" class="btn btn-secondary" name={{item.id}}>{{item.date}}</button>
+                <h8>Репозиторий: {{item.repository_name}}</h8>
+                {% with user_settings_list=item.params|get_user_settings %}
+                    {% for user_setting in user_settings_list %}
+                        <h8>{{user_setting}}</h8>
+                    {% endfor %}
+                {% endwith %}
+            {% endfor %}
+        </div>
+        </br>
+        </br>
+         {% if danger_modules_describe %}
+            </br>
+            </br>
+            <div class="w-100">
+                <div class="subheading mb-3">Результаты поиска</div>
+                    <ul class="fa-ul mb-0">
+
+                        {% for key, item in danger_modules_describe.items %}
+                        <li>
+                            Репозиторий: <a href={{key}}>{{key}}</a>
+                            </br>
+                            {% for key_data, item_data in item.items %}
+                                {% if key_data == "languages" %}
+                                    Язык программирования:
+                                    {% for language in item_data %}
+                                        {{language}}
+                                    {% endfor %}
+                                    </br>
+                                {% else %}
+                                    <table width="100%" border="1" cellpadding="4" cellspacing="0">
+                                        <tr>
+                                            <th>Имя модуля</th>
+                                            <th>Статус</th>
+                                            <th>Описание</th>
+                                        </tr>
+                                        {% for danger_module in item_data %}
+                                            {% with danger_module_list=danger_module|dict_to_list %}
+                                                <tr><td><a href={{danger_module_list.3}}>{{danger_module_list.0}}</a></td><td>{{danger_module_list.2}}</td><td>{{danger_module_list.1}}</td></tr>
+                                            {% endwith %}
+                                        {% endfor %}
+                                    </table>
+                                {% endif %}
+                            {% endfor %}
+                        </li>
+                        </br>
+                        {% endfor %}
+
+                    </ul>
+            </div>
+        {% else %}
+            </br>
+            </br>
+            <label>Результатов поиска нет</label>
+        {% endif %}
+
+   </form>
+{% endblock %}
+

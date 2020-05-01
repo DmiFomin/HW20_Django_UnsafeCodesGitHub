@@ -45,49 +45,10 @@
 
         <button type="submit" class="btn btn-warning">Искать</button>
 
-         {% if danger_modules_describe %}
-            </br>
-            </br>
-            <div class="w-100">
-                <div class="subheading mb-3">Результаты поиска</div>
-                    <ul class="fa-ul mb-0">
-
-                        {% for key, item in danger_modules_describe.items %}
-                        <li>
-                            Репозиторий: <a href={{key}}>{{key}}</a>
-                            </br>
-                            {% for key_data, item_data in item.items %}
-                                {% if key_data == "languages" %}
-                                    Язык программирования:
-                                    {% for language in item_data %}
-                                        {{language}}
-                                    {% endfor %}
-                                    </br>
-                                {% else %}
-                                    <table width="100%" border="1" cellpadding="4" cellspacing="0">
-                                        <tr>
-                                            <th>Имя модуля</th>
-                                            <th>Статус</th>
-                                            <th>Описание</th>
-                                        </tr>
-                                        {% for danger_module in item_data %}
-                                            <tr><td><a href={{danger_module.3}}>{{danger_module.0}}</a></td><td>{{danger_module.2}}</td><td>{{danger_module.1}}</td></tr>
-                                        {% endfor %}
-                                    </table>
-                                {% endif %}
-                            {% endfor %}
-                        </li>
-                        </br>
-                        {% endfor %}
-
-                    </ul>
-            </div>
-        {% else %}
-            </br>
-            </br>
-            <label>Результатов поиска нет</label>
-        {% endif %}
-
      </form>
+    </br>
+    </br>
+    </br>
+    Последний поиск {{last_searching}}
 {% endblock %}
 
