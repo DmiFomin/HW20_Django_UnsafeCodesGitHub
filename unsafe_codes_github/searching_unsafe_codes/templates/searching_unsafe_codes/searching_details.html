@@ -13,11 +13,9 @@
             {% for item in history_list %}
                 <button type="submit" class="btn btn-secondary" name={{item.id}}>{{item.date}}</button>
                 <h8>Репозиторий: {{item.repository_name}}</h8>
-                {% with user_settings_list=item.params|get_user_settings %}
-                    {% for user_setting in user_settings_list %}
-                        <h8>{{user_setting}}</h8>
-                    {% endfor %}
-                {% endwith %}
+                {% for user_setting in item.user_settings.all %}
+                    <h8>{{user_setting.description}}</h8>
+                {% endfor %}
             {% endfor %}
         </div>
         </br>

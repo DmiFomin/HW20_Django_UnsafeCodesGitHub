@@ -25,18 +25,23 @@ def dict_to_list(dict):
     return result_list
 
 
-def get_user_settings(user_settings):
-    param_list = []
-    for param in user_settings.split(';'):
-        if param:
-            try:
-                result_description = Unsafe_codes.objects.get(string_code=param)
-                if result_description:
-                    param_list.append(result_description.description)
-            except Unsafe_codes.DoesNotExist:
-                result_description = None
-    param_list.reverse()
-    return param_list
+def get_user_settings(user_settings, ):
+    description_list = []
+    string_code_list = user_settings
+    result_description = Unsafe_codes.objects.filter(string_code__in=string_code_list)
+    # for param in user_settings.split(';'):
+    #     if param:
+    #         try:
+    #             result_description = Unsafe_codes.objects.get(string_code=param)
+    #             if result_description:
+    #                 param_list.append(result_description.description)
+    #         except Unsafe_codes.DoesNotExist:
+    #             result_description = None
+
+    description_list = list(result_description)
+    print(description_list)
+    description_list.reverse()
+    return description_list
 
 
 register.filter('dict_to_list', dict_to_list)

@@ -82,6 +82,7 @@ class Unsafe_codes(models.Model):
 class History(models.Model):
     date = models.DateTimeField(auto_now_add=True)
     params = models.TextField()
+    user_settings = models.ManyToManyField(Unsafe_codes)
     repository_name = models.CharField(max_length=150)
     user = models.ForeignKey(AdvancedUser, on_delete=models.CASCADE)
     class Meta:
