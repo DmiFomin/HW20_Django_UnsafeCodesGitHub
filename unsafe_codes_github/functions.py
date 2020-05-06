@@ -167,6 +167,10 @@ def write_to_base(danger_modules_describe, user_settings, repository_name, curre
     history_record.user = current_user
     history_record.save()
 
+    string_code_list = user_settings
+    user_settings_for_record = Unsafe_codes.objects.filter(string_code__in=string_code_list)
+    history_record.user_settings.add(*list(user_settings_for_record))
+
     for item in danger_modules_describe.items():
         history_repositories = History_repositories()
         history_repositories.history=history_record
@@ -193,16 +197,30 @@ def get_history_list(id=None):
 
 def get_danger_modules_describe(id):
 
-    result_repository = History_repositories.objects.filter(history=id)
-    danger_modules_describe = {}
-    for item_repository in result_repository:
-        result_unsafe_code = History_unsafe_code.objects.filter(repository=item_repository.id)
-        list_unsafe_code = []
-        for item_unsafe_code in result_unsafe_code:
-            list_unsafe_code.append(utility.dict_from_str(item_unsafe_code.unsafe_code))
+    # result_repository = History_repositories.objects.filter(history=id)
+    # for item_repository in result_repository:
+    #     result_unsafe_code = History_unsafe_code.objects.filter(repository=item_repository.id)
+    #     list_unsafe_code = []
+    #     for item_unsafe_code in result_unsafe_code:
+    #         list_unsafe_code.append(utility.dict_from_str(item_unsafe_code.unsafe_code))
+    #
+    #     danger_modules_describe[item_repository.repository] = {'languages': [item_repository.language],
+    #                                                            'unsafe_modules': list_unsafe_code}
 
-        danger_modules_describe[item_repository.repository] = {'languages': [item_repository.language],
-                                                               'unsafe_modules': list_unsafe_code}
+    result_unsafe_code = History_unsafe_code.objects.filter(repository__history__id=id).order_by('repository').select_related('repository__language')
+
+    #TODO Возвращаю словарь. В дальнейшем надо обойтись одним запросом, без словаря.
+    danger_modules_describe = {}
+    list_unsafe_code = []
+    last_url = ''
+    for item in result_unsafe_code:
+        if last_url != item.repository.repository and last_url != '':
+            danger_modules_describe[last_url] = {'languages': [item.repository.language],
+                                                'unsafe_modules': list_unsafe_code}
+            list_unsafe_code = []
+
+        last_url = item.repository.repository
+        list_unsafe_code.append(utility.dict_from_str(item.unsafe_code))
 
     return danger_modules_describe
 

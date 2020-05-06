@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'searching_unsafe_codes',
     'users_and_permissions',
+    'debug_toolbar'
     #'send_email.apps.SendEmailConfig',
 ]
 
@@ -50,6 +51,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
 ROOT_URLCONF = 'unsafe_codes_github.urls'
@@ -138,3 +140,10 @@ EMAIL_HOST_USER = ''
 EMAIL_HOST_PASSWORD = ''
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# for django debug-toolbar
+INTERNAL_IPS = [
+    # ...
+    '127.0.0.1',
+    # ...
+]

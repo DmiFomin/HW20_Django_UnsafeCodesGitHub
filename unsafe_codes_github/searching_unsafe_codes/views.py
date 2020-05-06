@@ -8,7 +8,7 @@ from .forms import SettingsForm
 import functions as fn
 
 
-user_settings = 'eval;sqlite3;pickle;EMAIL_HOST_USER;EMAIL_HOST_PASSWORD;' #{'eval': 'on', 'sqlite3': 'on', 'pickle': 'on', 'EMAIL_HOST_USER': 'on', 'EMAIL_HOST_PASSWORD': 'on'}
+user_settings = list(Unsafe_codes.objects.all().values_list('string_code', flat=True)) #'eval;sqlite3;pickle;EMAIL_HOST_USER;EMAIL_HOST_PASSWORD;'
 repository_name = ''
 #danger_modules_describe = {}
 
@@ -32,6 +32,9 @@ class MainView(ListView):
     model = Unsafe_codes
     template_name = 'searching_unsafe_codes/index.html'
     context_object_name = 'unsafe_codes'
+
+    def get_queryset(self):
+        return Unsafe_codes.objects.select_related('language', 'status').all()
 
 
 class UnsafeCodesUpdataView(UpdateView):
@@ -65,11 +68,11 @@ class SearchingView(LoginRequiredMixin, ListView, UserSettingsContexMixin):
         global repository_name
         #global danger_modules_describe
 
-        user_settings = ''
+        user_settings = []
         params = request.POST
         for param in params:
             if param != 'repository_name':
-                user_settings = f'{param};{user_settings}'
+                user_settings.append(param)
             else:
                 repository_name = params['repository_name']
 
@@ -90,18 +93,18 @@ class SearchingHistoryView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     paginate_by = 4
 
     def get_queryset(self):
-        return History.objects.filter(user=self.request.user).order_by('-date')
+        return History.objects.filter(user=self.request.user).order_by('-date').prefetch_related('user_settings')
 
     def post(self, request, *args, **kwargs):
         params = request.POST
-        try:
-            history_id = list(params.keys())[1]
-            history_list = History.objects.filter(user=self.request.user, id=history_id)
-            danger_modules_describe = fn.get_danger_modules_describe(history_id)
-        except:
-            print('Error of getting history!')
-            history_list = []
-            danger_modules_describe = {}
+        #try:
+        history_id = list(params.keys())[1]
+        history_list = History.objects.filter(user=self.request.user, id=history_id)
+        danger_modules_describe = fn.get_danger_modules_describe(history_id)
+        # except:
+        #     print('Error of getting history!')
+        #     history_list = []
+        #     danger_modules_describe = {}
 
         return render(request, 'searching_unsafe_codes/searching_details.html', context={'history_list': history_list, 'danger_modules_describe': danger_modules_describe})
 
