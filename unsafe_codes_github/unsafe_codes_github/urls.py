@@ -16,11 +16,26 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
+from rest_framework import routers
+from searching_unsafe_codes.views_api import SettingsViewSet, StatusesViewSet, LanguagesViewSet, UnsafeCodesViewSet
+from users_and_permissions.views_api import AdvancedUserViewSet
+
+
+router = routers.DefaultRouter()
+router.register(r'users', AdvancedUserViewSet)
+router.register(r'settings', SettingsViewSet)
+router.register(r'statuses', StatusesViewSet)
+router.register(r'languages', LanguagesViewSet)
+router.register(r'languages', LanguagesViewSet)
+router.register(r'unsafe_codes', UnsafeCodesViewSet)
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('searching_unsafe_codes.urls', namespace='searching_unsafe_codes')),
-    path('users/', include('users_and_permissions.urls', namespace='users_and_permissions'))
+    path('users/', include('users_and_permissions.urls', namespace='users_and_permissions')),
+    path('api-auth/', include('rest_framework.urls')),
+    path('api/0/', include(router.urls)),
 ]
 
 

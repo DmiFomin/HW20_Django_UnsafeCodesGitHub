@@ -89,11 +89,6 @@ class History(models.Model):
         verbose_name = 'История поиска'
         verbose_name_plural = 'История поиска'
 
-    # Переопределеяем метод save. Записываем текущего юзера.
-    # def save(self, *args, **kwargs):
-    #     super().save(*args, **kwargs)
-    #     # Хотел получить текущего пользователя.
-
 
 class History_repositories(models.Model):
     history = models.ForeignKey(History, on_delete=models.PROTECT)
