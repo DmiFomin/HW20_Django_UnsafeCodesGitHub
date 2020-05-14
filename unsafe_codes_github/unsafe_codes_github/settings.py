@@ -25,7 +25,7 @@ SECRET_KEY = '+b7i1=cd!d0d8xs@xb30+!5mi0kk*-40(^+6(wly!=2fr=q-rw'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -39,7 +39,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'searching_unsafe_codes',
     'users_and_permissions',
-    'debug_toolbar'
+    'debug_toolbar',
+    'rest_framework',
+    'django_cleanup.apps.CleanupConfig',
     #'send_email.apps.SendEmailConfig',
 ]
 
@@ -86,6 +88,15 @@ DATABASES = {
     }
 }
 
+# DATABASES = {
+#     'default': {
+#         'NAME': 'sitedb',
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'USER': 'django',
+#         'PASSWORD': 'nu123456',
+#         'HOST': 'localhost'
+#     }
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
@@ -147,3 +158,11 @@ INTERNAL_IPS = [
     '127.0.0.1',
     # ...
 ]
+
+REST_FRAMEWORK = {
+    # Use Django's standard `django.contrib.auth` permissions,
+    # or allow read-only access for unauthenticated users.
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    ]
+}
