@@ -52,7 +52,7 @@
                 <a class="nav-link js-scroll-trigger" href="{% url 'searching_unsafe_codes:contacts' %}">Контакты</a>
             </li>
             {% if user.is_authenticated %}
-                <a class="nav-link js-scroll-trigger">{{user.username}}</a>
+                <a class="nav-link js-scroll-trigger" href="{% url 'users_and_permissions:profile_user' pk=user.pk %}">{{user.username}}</a>
                 <li class="nav-item">
                     <a class="nav-link js-scroll-trigger" href="{% url 'users_and_permissions:logout' %}">Выход</a>
                 </li>
@@ -77,6 +77,10 @@
     <hr class="m-0">
 
 </div>
+
+<script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
+<script src="{% static 'js/create_token.js' %}"></script>
+
 </body>
 
 </html>
