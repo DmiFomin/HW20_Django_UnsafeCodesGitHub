@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Поиск уязвимостей в модулях GitHub. Профиль.
+{% endblock %}
+
+{% block content %}
+    <h2 class="mb-5">Профиль</h2>
+    <div class="resume-item d-flex flex-column flex-md-row justify-content-between mb-5">
+        <div class="resume-content">
+            <h3 class="mb-3">{{object.username}}</h3>
+            <div class="subheading mb-3">E-mail {{object.email}}</div>
+            <div class="subheading mb-0">Токен <span id="token">{% if object.auth_token %} {{object.auth_token}} {% else %} не создан {% endif %}</span></div>
+            </br>
+            <button type="button" id="create_token" class="btn btn-primary">{% if object.auth_token %} Обновить токен {% else %} Создать токен {% endif %}</button>
+
+        </div>
+
+    </div>
+
+{% endblock %}

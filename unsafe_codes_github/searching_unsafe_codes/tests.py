@@ -96,17 +96,36 @@ class HistoryTest(TestCase):
         self.assertGreater(result.count(), 0)
 
 
-class TemplateFiltersTest(TestCase):
+# class TemplateFiltersTest(TestCase):
+#
+#     def setUp(self) -> None:
+#         self.user_settings = 'eval;sqlite3;pickle;EMAIL_HOST_USER;EMAIL_HOST_PASSWORD;'
+#         self.unsafe_code = mixer.blend(Unsafe_codes,
+#                                        language = mixer.blend(Languages),
+#                                        string_code = 'sqlite3',
+#                                        description = 'description',
+#                                        add_description = 'add_description',
+#                                        status = mixer.blend(Statuses))
+#
+#     def test_get_user_settings(self):
+#         print(self.user_settings)
+#         user_settings_list = template_filters.get_user_settings(self.user_settings)
+#         self.assertGreater(len(user_settings_list), 0)
 
-    def setUp(self) -> None:
-        self.user_settings = 'eval;sqlite3;pickle;EMAIL_HOST_USER;EMAIL_HOST_PASSWORD;'
-        self.unsafe_code = mixer.blend(Unsafe_codes,
-                                       language = mixer.blend(Languages),
-                                       string_code = 'sqlite3',
-                                       description = 'description',
-                                       add_description = 'add_description',
-                                       status = mixer.blend(Statuses))
 
-    def test_get_user_settings(self):
-        user_settings_list = template_filters.get_user_settings(self.user_settings)
-        self.assertGreater(len(user_settings_list), 0)
+class ApiAccessTest(TestCase):
+
+    def setUp(self):
+        self.client = Client()
+        self.superuser = AdvancedUser.objects.create_superuser(username='test_superuser', email='test_superemail@email.com', password='123qwe123')
+        self.user = AdvancedUser.objects.create_user(username='test_user', email='test_email@email.com', password='123qwe123')
+
+    def test_superuser(self):
+        self.client.login(username='test_superuser', password='123qwe123')
+        response = self.client.get('/api/0/users/')
+        self.assertEqual(response.status_code, 200)
+
+    def test_user(self):
+        self.client.login(username='test_user', password='123qwe123')
+        response = self.client.get('/api/0/users/')
+        self.assertEqual(response.status_code, 403)
