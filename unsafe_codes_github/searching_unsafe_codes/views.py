@@ -12,6 +12,8 @@ user_settings = list(Unsafe_codes.objects.all().values_list('string_code', flat=
 repository_name = ''
 #danger_modules_describe = {}
 
+print(Unsafe_codes.objects.all())
+print(type(Unsafe_codes.objects.all()))
 
 class UserSettingsContexMixin(ContextMixin):
     def get_context_data(self, *args, **kwargs):

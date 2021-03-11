@@ -39,7 +39,7 @@ def get_user_settings(user_settings, ):
     #             result_description = None
 
     description_list = list(result_description)
-    print(description_list)
+    #print(description_list)
     description_list.reverse()
     return description_list
 
